@@ -5,6 +5,7 @@ import Avatar from '../components/Avatar';
 import { MoveIcon } from '../utils/icons';
 import { playSlap, playWhip } from '../utils/sounds';
 import { MOVES } from '../utils/moves';
+import { useLocale } from '../i18n';
 import type { AigramContact, MoveId } from '../types';
 
 interface Props {
@@ -29,12 +30,12 @@ const PHASE_TIMINGS: Record<Phase, number> = {
   cooking: 0, // open-ended — until image is ready
 };
 
-const COOKING_LINES = [
-  'INKING THE PANEL…',
-  'MIXING HALFTONE DOTS…',
-  'PRINTING THE PUNCHLINE…',
-  'BRINGING IN THE LETTERER…',
-  'FILLING THE BURST…',
+const COOKING_KEYS = [
+  'slam.cook.1',
+  'slam.cook.2',
+  'slam.cook.3',
+  'slam.cook.4',
+  'slam.cook.5',
 ];
 
 export default function Slam({
@@ -45,8 +46,9 @@ export default function Slam({
   errored,
   onDone,
 }: Props) {
+  const { t } = useLocale();
   const [phase, setPhase] = useState<Phase>('wind');
-  const [cookLine, setCookLine] = useState(COOKING_LINES[0]);
+  const [cookKey, setCookKey] = useState(COOKING_KEYS[0]);
   const move = MOVES.find((m) => m.id === moveId);
   const cookLineIdxRef = useRef(0);
   const doneRef = useRef(false);
@@ -78,8 +80,8 @@ export default function Slam({
   useEffect(() => {
     if (phase !== 'cooking') return;
     const intv = window.setInterval(() => {
-      cookLineIdxRef.current = (cookLineIdxRef.current + 1) % COOKING_LINES.length;
-      setCookLine(COOKING_LINES[cookLineIdxRef.current]);
+      cookLineIdxRef.current = (cookLineIdxRef.current + 1) % COOKING_KEYS.length;
+      setCookKey(COOKING_KEYS[cookLineIdxRef.current]);
     }, 1800);
     return () => clearInterval(intv);
   }, [phase]);
@@ -154,8 +156,8 @@ export default function Slam({
         {/* "Cooking" label after splatter, while AI image generates */}
         {phase === 'cooking' && (
           <div className="tyi-slam__cooking">
-            <div className="tyi-impact tyi-slam__cookHeader">
-              {imageUrl ? 'READY!' : cookLine}
+            <div className="tyi-prose-strong tyi-slam__cookHeader">
+              {imageUrl ? t('slam.ready') : t(cookKey)}
             </div>
             <div className="tyi-slam__dots" aria-hidden>
               <span /><span /><span />

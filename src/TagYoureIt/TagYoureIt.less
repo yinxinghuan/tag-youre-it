@@ -277,6 +277,20 @@
   letter-spacing: 0.02em;
 }
 
+// Multi-language safe text — forces Inter so CJK / accented Latin render.
+// Use this on EVERY translatable string. Decorative shouts that stay
+// English-only keep .tyi-shout / .tyi-impact / .tyi-marker (handwritten
+// fonts that only cover Latin glyphs).
+.tyi-prose {
+  font-family: var(--font-prose);
+  letter-spacing: 0;
+}
+.tyi-prose-strong {
+  font-family: var(--font-prose);
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
 // ─── Animations ─────────────────────────────────────────────────────────────
 
 @keyframes tyi-shake {

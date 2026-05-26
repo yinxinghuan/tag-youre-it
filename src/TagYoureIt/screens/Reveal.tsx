@@ -6,6 +6,7 @@ import Watermark from '../components/Watermark';
 import { ArrowIcon, ShareIcon, CheckIcon, MoveIcon } from '../utils/icons';
 import { MOVES } from '../utils/moves';
 import { playFanfare } from '../utils/sounds';
+import { useLocale } from '../i18n';
 import type { AigramContact, MoveId } from '../types';
 
 interface Props {
@@ -30,6 +31,7 @@ export default function Reveal({
   onShare,
   onLobby,
 }: Props) {
+  const { t } = useLocale();
   const move = MOVES.find((m) => m.id === moveId);
 
   useEffect(() => {
@@ -43,6 +45,7 @@ export default function Reveal({
       <Halftone color="var(--ink)" spacing={12} radius={2} opacity={0.12} />
 
       <div className="tyi-stage__header">
+        {/* Decorative shout — stays English in comic font */}
         <div className="tyi-sticker tyi-sticker--it tyi-sticker--small">TAGGED!</div>
         <div className="tyi-sticker tyi-sticker--paper tyi-sticker--small">
           {move.num} · {move.shout}
@@ -51,7 +54,7 @@ export default function Reveal({
 
       <div className="tyi-stage__scroll">
         <div className="tyi-reveal__panel">
-          <div className="tyi-panel__caption">EVIDENCE</div>
+          <div className="tyi-panel__caption tyi-prose-strong">{t('reveal.evidence')}</div>
 
           <div className="tyi-reveal__art">
             {imageUrl && !errored ? (
@@ -73,8 +76,11 @@ export default function Reveal({
                   <div className="tyi-reveal__bigWeapon">
                     <MoveIcon id={moveId} size={180} />
                   </div>
-                  <div className="tyi-impact tyi-reveal__fallbackTxt">
-                    {target.name.toUpperCase()} GETS {move.shout}
+                  <div className="tyi-prose-strong tyi-reveal__fallbackTxt">
+                    {t('reveal.fallback_title', {
+                      name: target.name,
+                      shout: move.shout,
+                    })}
                   </div>
                 </div>
               </div>
@@ -94,30 +100,30 @@ export default function Reveal({
           <div className="tyi-reveal__caption">
             <Avatar src={target.head_url} name={target.name} size={42} />
             <div>
-              <div className="tyi-impact tyi-reveal__capName">{target.name}</div>
-              <div className="tyi-marker tyi-reveal__capLine">just got it.</div>
+              <div className="tyi-prose-strong tyi-reveal__capName">{target.name}</div>
+              <div className="tyi-prose tyi-reveal__capLine">{t('reveal.caption_line')}</div>
             </div>
           </div>
         </div>
 
         {/* Notify status sticker */}
         <div
-          className={`tyi-reveal__notice ${
+          className={`tyi-reveal__notice tyi-prose-strong ${
             notified ? 'tyi-reveal__notice--ok' : 'tyi-reveal__notice--info'
           }`}
         >
           {isDemo ? (
             <>
               <CheckIcon size={20} />
-              DEMO MODE · notification not sent
+              {t('reveal.notice_demo')}
             </>
           ) : notified ? (
             <>
               <CheckIcon size={20} />
-              SENT to {target.name}&apos;s phone
+              {t('reveal.notice_sent', { name: target.name })}
             </>
           ) : (
-            <>QUEUING NOTIFICATION…</>
+            <>{t('reveal.notice_queuing')}</>
           )}
         </div>
       </div>
@@ -132,7 +138,7 @@ export default function Reveal({
           disabled={!imageUrl || errored || isDemo}
         >
           <ShareIcon size={20} />
-          POST TO FEED
+          <span className="tyi-prose-strong">{t('reveal.cta_share')}</span>
         </button>
         <button
           className="tyi-btn tyi-btn--block tyi-btn--ghost"
@@ -141,7 +147,8 @@ export default function Reveal({
             onLobby();
           }}
         >
-          BACK TO LOBBY <ArrowIcon size={16} />
+          <span className="tyi-prose-strong">{t('reveal.cta_lobby')}</span>
+          <ArrowIcon size={16} />
         </button>
       </div>
 

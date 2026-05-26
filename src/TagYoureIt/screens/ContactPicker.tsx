@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import Avatar from '../components/Avatar';
 import Watermark from '../components/Watermark';
 import { BackIcon } from '../utils/icons';
+import { useLocale } from '../i18n';
 import type { AigramContact } from '../types';
 
 interface Props {
@@ -25,6 +26,7 @@ export default function ContactPicker({
   onNext,
   onBack,
 }: Props) {
+  const { t } = useLocale();
   const selected = contacts.find((c) => c.telegram_id === selectedId);
 
   return (
@@ -39,31 +41,26 @@ export default function ContactPicker({
           aria-label="back"
         >
           <BackIcon size={18} />
-          BACK
+          <span className="tyi-prose-strong">{t('lobby.cta_back')}</span>
         </button>
-        <div className="tyi-sticker tyi-sticker--paper tyi-sticker--small">
-          PICK · YOUR · MARK
+        <div className="tyi-sticker tyi-sticker--paper tyi-sticker--small tyi-prose-strong">
+          {t('picker.title_bar')}
         </div>
         <div style={{ width: 88 }} />
       </div>
 
       <div className="tyi-stage__scroll">
-        <h2 className="tyi-shout tyi-picker__title">
-          WHO GETS{' '}
-          <span style={{ color: isIt ? 'var(--it)' : 'var(--cool)' }}>
-            {isIt ? 'TAGGED BACK' : 'TAGGED'}?
-          </span>
+        <h2 className="tyi-picker__title tyi-prose-strong">
+          {isIt ? t('picker.h2_tag_back') : t('picker.h2_tag')}
         </h2>
         {isDemo && (
-          <div className="tyi-picker__hint">
-            (DEMO friends — log in via Aigram to see your real ones)
-          </div>
+          <div className="tyi-picker__hint tyi-prose">{t('picker.preview_hint')}</div>
         )}
-        {loading && <div className="tyi-picker__empty">Loading friends…</div>}
+        {loading && (
+          <div className="tyi-picker__empty tyi-prose">{t('picker.loading')}</div>
+        )}
         {!loading && contacts.length === 0 && (
-          <div className="tyi-picker__empty">
-            No friends found on Aigram yet. Invite some first!
-          </div>
+          <div className="tyi-picker__empty tyi-prose">{t('picker.empty')}</div>
         )}
 
         <div className="tyi-picker__grid">
@@ -79,9 +76,11 @@ export default function ContactPicker({
                 }}
               >
                 <Avatar src={c.head_url} name={c.name} size={64} tilt={i % 3 === 0 ? -4 : 4} />
-                <div className="tyi-picker__name">{c.name}</div>
+                <div className="tyi-picker__name tyi-prose-strong">{c.name}</div>
                 {isSelected && (
-                  <div className="tyi-picker__pick">PICKED</div>
+                  <div className="tyi-picker__pick tyi-prose-strong">
+                    {t('picker.picked_badge')}
+                  </div>
                 )}
               </button>
             );
@@ -98,7 +97,11 @@ export default function ContactPicker({
           }}
           disabled={!selected}
         >
-          {selected ? `→ TAG ${selected.name.toUpperCase()}` : 'PICK A FRIEND'}
+          <span className="tyi-prose-strong">
+            {selected
+              ? t('picker.cta_next', { name: selected.name })
+              : t('picker.cta_empty')}
+          </span>
         </button>
       </div>
 
@@ -116,11 +119,11 @@ function PickerStyles() {
     el.id = id;
     el.textContent = `
       .tyi-picker__title {
-        font-size: 32px;
-        line-height: 1.05;
+        font-size: 28px;
+        line-height: 1.1;
         margin: 4px 0 6px;
-        text-transform: uppercase;
-        text-shadow: 2px 2px 0 var(--white);
+        font-weight: 900;
+        letter-spacing: -0.01em;
       }
       .tyi-picker__hint {
         font-family: var(--font-marker);

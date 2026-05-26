@@ -5,6 +5,7 @@ import Watermark from '../components/Watermark';
 import { BackIcon, MoveIcon } from '../utils/icons';
 import { relativeTime } from '../utils/format';
 import { MOVES } from '../utils/moves';
+import { useLocale } from '../i18n';
 import type { IncomingTag, MoveId } from '../types';
 
 function WallNoArt({ move, targetName }: { move: MoveId; targetName: string }) {
@@ -37,6 +38,7 @@ interface Props {
 }
 
 export default function Wall({ wall, myId, onTagBack, onBack }: Props) {
+  const { t, tp } = useLocale();
   return (
     <>
       <div className="tyi-stage__header">
@@ -49,40 +51,39 @@ export default function Wall({ wall, myId, onTagBack, onBack }: Props) {
           aria-label="back"
         >
           <BackIcon size={18} />
-          BACK
+          <span className="tyi-prose-strong">{t('lobby.cta_back')}</span>
         </button>
-        <div className="tyi-sticker tyi-sticker--paper tyi-sticker--small">
-          THE WALL
+        <div className="tyi-sticker tyi-sticker--paper tyi-sticker--small tyi-prose-strong">
+          {t('wall.title_bar')}
         </div>
         <div style={{ width: 88 }} />
       </div>
 
       <div className="tyi-stage__scroll">
-        <h2 className="tyi-shout tyi-wall__title">
-          RECENT <span style={{ color: 'var(--it)' }}>TAGS</span>
+        <h2 className="tyi-wall__title tyi-prose-strong">
+          {t('wall.h2_recent')}{' '}
+          <span style={{ color: 'var(--it)' }}>{t('wall.h2_tags')}</span>
         </h2>
-        <div className="tyi-wall__sub tyi-marker">
-          last {wall.length} hits from the ring
+        <div className="tyi-wall__sub tyi-prose">
+          {tp('wall.sub', 'wall.sub_plural', wall.length)}
         </div>
 
         {wall.length === 0 ? (
-          <div className="tyi-wall__empty">
-            No tags yet. Be the first one out there.
-          </div>
+          <div className="tyi-wall__empty tyi-prose">{t('wall.empty')}</div>
         ) : (
           <div className="tyi-wall__feed">
-            {wall.map((t) => {
-              const move = MOVES.find((m) => m.id === t.move_id);
-              const taggedMe = myId && t.target_id === myId;
-              const senderIsMe = myId && t.sender_id === myId;
+            {wall.map((item) => {
+              const move = MOVES.find((m) => m.id === item.move_id);
+              const taggedMe = myId && item.target_id === myId;
+              const senderIsMe = myId && item.sender_id === myId;
               return (
-                <div key={t.id} className="tyi-wall__card">
+                <div key={item.id} className="tyi-wall__card">
                   {/* Image */}
                   <div className="tyi-wall__art">
-                    {t.image_url ? (
-                      <img src={t.image_url} alt="" className="tyi-wall__img" />
+                    {item.image_url ? (
+                      <img src={item.image_url} alt="" className="tyi-wall__img" />
                     ) : (
-                      <WallNoArt move={t.move_id} targetName={t.target_name} />
+                      <WallNoArt move={item.move_id} targetName={item.target_name} />
                     )}
                     <div className="tyi-wall__moveStamp">{move?.shout || 'TAGGED'}</div>
                   </div>
@@ -90,22 +91,27 @@ export default function Wall({ wall, myId, onTagBack, onBack }: Props) {
                   {/* Caption */}
                   <div className="tyi-wall__caption">
                     <div className="tyi-wall__faces">
-                      <Avatar src={t.sender_avatar} name={t.sender_name} size={36} />
+                      <Avatar src={item.sender_avatar} name={item.sender_name} size={36} />
                       <div className="tyi-wall__arrow">→</div>
-                      <Avatar src={t.target_avatar} name={t.target_name} size={36} />
+                      <Avatar src={item.target_avatar} name={item.target_name} size={36} />
                     </div>
-                    <div className="tyi-wall__line">
-                      <span className="tyi-impact">{t.sender_name}</span>
-                      <span className="tyi-marker"> tagged </span>
-                      <span className="tyi-impact">{t.target_name}</span>
+                    <div className="tyi-wall__line tyi-prose">
+                      {t('wall.line', {
+                        sender: item.sender_name,
+                        target: item.target_name,
+                      })}
                     </div>
-                    <div className="tyi-wall__meta">
-                      <span>{relativeTime(t.ts)} ago</span>
+                    <div className="tyi-wall__meta tyi-prose">
+                      <span>{t('wall.time_ago', { t: relativeTime(item.ts) })}</span>
                       {taggedMe && (
-                        <span className="tyi-wall__pingMe">↳ YOU GOT TAGGED</span>
+                        <span className="tyi-wall__pingMe tyi-prose-strong">
+                          {t('wall.you_got_tagged')}
+                        </span>
                       )}
                       {senderIsMe && (
-                        <span className="tyi-wall__pingMine">↳ YOUR HIT</span>
+                        <span className="tyi-wall__pingMine tyi-prose-strong">
+                          {t('wall.your_hit')}
+                        </span>
                       )}
                     </div>
                     {taggedMe && (
@@ -114,10 +120,12 @@ export default function Wall({ wall, myId, onTagBack, onBack }: Props) {
                         style={{ marginTop: 6 }}
                         onPointerDown={(e) => {
                           e.preventDefault();
-                          onTagBack(t);
+                          onTagBack(item);
                         }}
                       >
-                        TAG {t.sender_name.toUpperCase()} BACK
+                        <span className="tyi-prose-strong">
+                          {t('wall.cta_tag_back', { name: item.sender_name })}
+                        </span>
                       </button>
                     )}
                   </div>
@@ -142,10 +150,11 @@ function WallStyles() {
     el.id = id;
     el.textContent = `
       .tyi-wall__title {
-        font-size: 32px;
+        font-size: 28px;
         margin: 4px 0 2px;
-        text-transform: uppercase;
-        text-shadow: 2px 2px 0 var(--white);
+        font-weight: 900;
+        letter-spacing: -0.01em;
+        line-height: 1.05;
       }
       .tyi-wall__sub {
         font-size: 14px;

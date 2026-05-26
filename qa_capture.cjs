@@ -33,10 +33,12 @@ const SCREENS = [
   });
   for (const s of SCREENS) {
     const page = await browser.newPage();
+    page.on('console', (msg) => console.log('[console]', msg.type(), msg.text()));
+    page.on('pageerror', (err) => console.log('[pageerror]', err.message));
     await page.setViewport({ width: 380, height: 760, deviceScaleFactor: 2 });
     const url = `${BASE}?demo=${s.demo}`;
     console.log('→', url);
-    await page.goto(url, { waitUntil: 'networkidle0', timeout: 15000 });
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
     await page.evaluate(() => document.fonts.ready);
     // Allow css animations & dom mutations to settle. Slam needs longer
     // to reach the "cooking" phase (~2s in).

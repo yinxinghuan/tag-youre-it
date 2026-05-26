@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import './TagYoureIt.less';
 import { isInAigram, telegramId, useGenImage, useGameEvent, callAigramAPI } from '@shared/runtime';
 import type { AigramResponse } from '@shared/runtime';
+import { LocaleProvider } from './i18n';
 import { useAigramContacts } from './hooks/useAigramContacts';
 import { useTagState } from './hooks/useTagState';
 import Lobby from './screens/Lobby';
@@ -116,6 +117,14 @@ const DEMO_WALL: IncomingTag[] = [
 ];
 
 export default function TagYoureIt() {
+  return (
+    <LocaleProvider>
+      <TagYoureItInner />
+    </LocaleProvider>
+  );
+}
+
+function TagYoureItInner() {
   // First-touch audio unlock — captured at document root.
   const audioReady = useRef(false);
   useEffect(() => {
@@ -295,7 +304,7 @@ export default function TagYoureIt() {
 
   // ── Render ───────────────────────────────────────────────────────────
   if (isDemoView) {
-    return <DemoView mode={demoMode!} contacts={contacts} />;
+    return <DemoView mode={demoMode!} />;
   }
 
   const isDemoMode = isDemo || !isInAigram;
@@ -379,12 +388,20 @@ export default function TagYoureIt() {
 
 // ─── Demo wrapper — forces specific screen states for posters/screenshots ───
 
-function DemoView({ mode, contacts }: { mode: DemoMode; contacts: AigramContact[] }) {
-  const demoTarget: AigramContact = contacts[0] || {
-    telegram_id: 'demo1',
-    name: 'Algram',
-    head_url: '',
-  };
+// These names are placeholder users for poster/screenshot purposes only —
+// they never appear in production (real player contacts come from Aigram).
+const DEMO_CONTACTS_FOR_SHOWCASE: AigramContact[] = [
+  { telegram_id: 'demo1', name: 'Algram', head_url: '' },
+  { telegram_id: 'demo2', name: 'Jenny', head_url: '' },
+  { telegram_id: 'demo3', name: 'JM·F', head_url: '' },
+  { telegram_id: 'demo4', name: 'ghostpixel', head_url: '' },
+  { telegram_id: 'demo5', name: 'Isaya', head_url: '' },
+  { telegram_id: 'demo6', name: 'Isabel', head_url: '' },
+];
+
+function DemoView({ mode }: { mode: DemoMode }) {
+  const contacts = DEMO_CONTACTS_FOR_SHOWCASE;
+  const demoTarget: AigramContact = contacts[0];
   const demoMove: MoveId = 'pie';
 
   return (

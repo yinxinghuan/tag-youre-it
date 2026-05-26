@@ -11,15 +11,8 @@ import {
 } from '@shared/runtime';
 import type { AigramContact } from '../types';
 
-/** Local-preview placeholder only. Never reached when running in Aigram. */
-const DEMO_CONTACTS: AigramContact[] = [
-  { telegram_id: 'demo1', name: 'Algram', head_url: '' },
-  { telegram_id: 'demo2', name: 'Jenny', head_url: '' },
-  { telegram_id: 'demo3', name: 'JM·F', head_url: '' },
-  { telegram_id: 'demo4', name: 'ghostpixel', head_url: '' },
-  { telegram_id: 'demo5', name: 'Isaya', head_url: '' },
-  { telegram_id: 'demo6', name: 'Isabel', head_url: '' },
-];
+// No demo fallback: when running outside Aigram we surface an empty state
+// rather than inventing friends. Screenshot demos inject their own list.
 
 interface RawContact {
   telegram_id: number | string;
@@ -77,7 +70,9 @@ export function useAigramContacts(): UseAigramContactsResult {
 
   useEffect(() => {
     if (!isInAigram) {
-      setContacts(DEMO_CONTACTS);
+      // No bridge — surface an empty list. The picker shows an explicit
+      // "open in Aigram" empty state; demo URLs override this list.
+      setContacts([]);
       setIsDemo(true);
       setLoading(false);
       return;

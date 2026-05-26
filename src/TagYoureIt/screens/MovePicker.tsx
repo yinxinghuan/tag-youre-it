@@ -3,6 +3,7 @@ import Avatar from '../components/Avatar';
 import Watermark from '../components/Watermark';
 import { MoveIcon, BackIcon } from '../utils/icons';
 import { MOVES } from '../utils/moves';
+import { useLocale } from '../i18n';
 import type { AigramContact, MoveId } from '../types';
 
 interface Props {
@@ -29,6 +30,7 @@ export default function MovePicker({
   onConfirm,
   onBack,
 }: Props) {
+  const { t } = useLocale();
   const selectedSpec = MOVES.find((m) => m.id === selectedMove);
 
   return (
@@ -43,10 +45,10 @@ export default function MovePicker({
           aria-label="back"
         >
           <BackIcon size={18} />
-          BACK
+          <span className="tyi-prose-strong">{t('lobby.cta_back')}</span>
         </button>
-        <div className="tyi-sticker tyi-sticker--paper tyi-sticker--small">
-          ARMORY
+        <div className="tyi-sticker tyi-sticker--paper tyi-sticker--small tyi-prose-strong">
+          {t('move.title_bar')}
         </div>
         <div style={{ width: 88 }} />
       </div>
@@ -55,12 +57,12 @@ export default function MovePicker({
         <div className="tyi-move__targetRow">
           <Avatar src={target.head_url} name={target.name} size={56} />
           <div>
-            <div className="tyi-marker tyi-move__targetCue">target acquired:</div>
-            <div className="tyi-impact tyi-move__targetName">{target.name}</div>
+            <div className="tyi-prose tyi-move__targetCue">{t('move.target_cue')}</div>
+            <div className="tyi-prose-strong tyi-move__targetName">{target.name}</div>
           </div>
         </div>
 
-        <h2 className="tyi-shout tyi-move__title">PICK YOUR WEAPON</h2>
+        <h2 className="tyi-move__title tyi-prose-strong">{t('move.h2')}</h2>
 
         <div className="tyi-move__grid">
           {MOVES.map((m) => {
@@ -80,9 +82,16 @@ export default function MovePicker({
                 <div className="tyi-move__icon">
                   <MoveIcon id={m.id} size={56} />
                 </div>
+                {/* Weapon shout — stays English in comic font. */}
                 <div className="tyi-move__shout">{m.shout}</div>
-                <div className="tyi-move__desc">{m.desc}</div>
-                {isSel && <div className="tyi-move__loaded">LOADED</div>}
+                <div className="tyi-move__desc tyi-prose-strong">
+                  {t(`weapon.${m.id}.desc`)}
+                </div>
+                {isSel && (
+                  <div className="tyi-move__loaded tyi-prose-strong">
+                    {t('move.loaded_badge')}
+                  </div>
+                )}
               </button>
             );
           })}
@@ -98,7 +107,11 @@ export default function MovePicker({
           }}
           disabled={!selectedSpec}
         >
-          {selectedSpec ? `SLAM ${selectedSpec.shout}` : 'PICK A WEAPON'}
+          <span className="tyi-prose-strong">
+            {selectedSpec
+              ? t('move.cta_next', { shout: selectedSpec.shout })
+              : t('move.cta_empty')}
+          </span>
         </button>
       </div>
 
@@ -133,9 +146,11 @@ function MoveStyles() {
         font-size: 22px;
       }
       .tyi-move__title {
-        font-size: 28px;
+        font-size: 26px;
         margin: 6px 0 12px;
-        text-shadow: 2px 2px 0 var(--white);
+        font-weight: 900;
+        letter-spacing: -0.01em;
+        line-height: 1.1;
       }
       .tyi-move__grid {
         display: grid;
@@ -182,13 +197,12 @@ function MoveStyles() {
         text-transform: uppercase;
       }
       .tyi-move__desc {
-        font-family: var(--font-prose);
-        font-weight: 700;
-        font-size: 11px;
-        line-height: 1.2;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-        opacity: 0.85;
+        font-size: 12px;
+        line-height: 1.25;
+        letter-spacing: 0.01em;
+        opacity: 0.9;
+        text-align: center;
+        max-width: 100%;
       }
       .tyi-move__loaded {
         position: absolute;

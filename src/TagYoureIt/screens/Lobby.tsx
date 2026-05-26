@@ -6,6 +6,7 @@ import Watermark from '../components/Watermark';
 import { ArrowIcon, MailIcon, ShareIcon } from '../utils/icons';
 import { relativeTime } from '../utils/format';
 import { getMoveSpec } from '../utils/moves';
+import { useLocale } from '../i18n';
 import type { IncomingTag, AigramContact } from '../types';
 
 interface LobbyProps {
@@ -29,8 +30,9 @@ export default function Lobby({
   onTagSomeone,
   onOpenWall,
 }: LobbyProps) {
+  const { t, tp } = useLocale();
   const dominantColor = isIt ? 'it' : 'tag';
-  const ctaLabel = isIt ? 'TAG BACK NOW' : 'TAG SOMEONE';
+  const ctaLabel = isIt ? t('lobby.cta_tag_back') : t('lobby.cta_tag');
 
   // Lobby avatar strip — show up to 5 from contacts to suggest "your friends"
   const stripContacts = useMemo(() => contacts.slice(0, 5), [contacts]);
@@ -52,7 +54,7 @@ export default function Lobby({
           aria-label="wall"
         >
           <ShareIcon size={18} />
-          WALL · {wallCount}
+          <span className="tyi-prose-strong">{t('lobby.wall_count', { n: wallCount })}</span>
         </button>
       </div>
 
@@ -71,9 +73,10 @@ export default function Lobby({
         {/* Status card */}
         {isIt && newestIncoming ? (
           <div className="tyi-panel tyi-panel--it tyi-lobby__status">
-            <div className="tyi-panel__caption">STATUS</div>
+            <div className="tyi-panel__caption tyi-prose-strong">{t('lobby.status')}</div>
             <Halftone color="var(--white)" spacing={10} radius={1.5} opacity={0.16} />
             <div className="tyi-lobby__statusBody">
+              {/* Decorative shout — English only, comic font */}
               <div className="tyi-shout tyi-lobby__statusShout">YOU'RE IT!</div>
               <div className="tyi-lobby__statusRow">
                 <Avatar
@@ -83,39 +86,49 @@ export default function Lobby({
                 />
                 <div>
                   <div className="tyi-lobby__statusBy">
-                    <span className="tyi-marker">tagged by</span>{' '}
-                    <span className="tyi-impact">{newestIncoming.sender_name}</span>
+                    <span className="tyi-prose">{t('lobby.tagged_by')}</span>{' '}
+                    <span className="tyi-prose-strong">{newestIncoming.sender_name}</span>
                   </div>
-                  <div className="tyi-lobby__statusMeta">
-                    {(getMoveSpec(newestIncoming.move_id)?.shout || 'TAGGED')}{' '}
-                    · {relativeTime(newestIncoming.ts)} ago
+                  <div className="tyi-lobby__statusMeta tyi-prose-strong">
+                    {t('lobby.move_ago', {
+                      shout: getMoveSpec(newestIncoming.move_id)?.shout || 'TAGGED',
+                      time: relativeTime(newestIncoming.ts),
+                    })}
                   </div>
                 </div>
               </div>
               {incomingCount > 1 && (
-                <div className="tyi-lobby__moreIncoming">
-                  + {incomingCount - 1} more incoming tag{incomingCount - 1 > 1 ? 's' : ''}
+                <div className="tyi-lobby__moreIncoming tyi-prose">
+                  {tp(
+                    'lobby.more_incoming',
+                    'lobby.more_incoming_plural',
+                    incomingCount - 1,
+                  )}
                 </div>
               )}
             </div>
           </div>
         ) : (
           <div className="tyi-panel tyi-panel--paper tyi-lobby__status">
-            <div className="tyi-panel__caption">STATUS</div>
+            <div className="tyi-panel__caption tyi-prose-strong">{t('lobby.status')}</div>
             <div className="tyi-lobby__statusBody tyi-lobby__statusBody--free">
-              <div className="tyi-shout tyi-lobby__statusShout tyi-lobby__statusShout--free">
-                YOU'RE FREE.
+              <div className="tyi-lobby__statusShout tyi-lobby__statusShout--free tyi-prose-strong">
+                {t('lobby.free_big')}
               </div>
-              <div className="tyi-marker tyi-lobby__statusSub">…for now.</div>
+              <div className="tyi-lobby__statusSub tyi-prose">{t('lobby.free_sub')}</div>
             </div>
           </div>
         )}
 
         {/* Friends strip */}
-        {stripContacts.length > 0 && (
+        {stripContacts.length > 0 ? (
           <div className="tyi-lobby__friends">
-            <div className="tyi-marker tyi-lobby__friendsLabel">
-              {contactsCount} friend{contactsCount !== 1 ? 's' : ''} unsuspecting…
+            <div className="tyi-prose tyi-lobby__friendsLabel">
+              {tp(
+                'lobby.friends_unsuspecting',
+                'lobby.friends_unsuspecting_plural',
+                contactsCount,
+              )}
             </div>
             <div className="tyi-lobby__friendsRow">
               {stripContacts.map((c, i) => (
@@ -134,6 +147,10 @@ export default function Lobby({
               )}
             </div>
           </div>
+        ) : (
+          <div className="tyi-lobby__noFriends tyi-prose">
+            {t('lobby.no_friends')}
+          </div>
         )}
 
         {/* Inbox link */}
@@ -146,8 +163,8 @@ export default function Lobby({
             }}
           >
             <MailIcon size={20} />
-            <span>
-              {incomingCount} incoming tag{incomingCount > 1 ? 's' : ''} on the wall
+            <span className="tyi-prose-strong">
+              {tp('lobby.inbox', 'lobby.inbox_plural', incomingCount)}
             </span>
             <ArrowIcon size={18} />
           </button>
@@ -162,7 +179,7 @@ export default function Lobby({
             onTagSomeone();
           }}
         >
-          {ctaLabel}
+          <span className="tyi-prose-strong">{ctaLabel}</span>
         </button>
       </div>
 
@@ -225,10 +242,22 @@ function LobbyStyles() {
       .tyi-lobby__statusShout--free {
         color: var(--ink);
         text-shadow: none;
-        font-size: 38px;
+        font-size: 32px;
+        line-height: 1.05;
+        font-weight: 900;
+        letter-spacing: -0.01em;
       }
       .tyi-lobby__statusSub {
-        font-size: 18px;
+        font-size: 16px;
+        color: var(--ink-soft);
+      }
+      .tyi-lobby__noFriends {
+        text-align: center;
+        font-size: 14px;
+        padding: 10px 12px;
+        background: var(--white);
+        border: 3px dashed var(--ink);
+        margin-bottom: 14px;
         color: var(--ink-soft);
       }
       .tyi-lobby__statusRow {
