@@ -1,0 +1,341 @@
+// Tag, You're It — comic-book BAM design system
+
+// ─── Tokens ─────────────────────────────────────────────────────────────────
+
+.tyi-root {
+  --ink: #111111;
+  --ink-soft: #2a2a2a;
+  --paper: #f4ecd8;
+  --paper-light: #fbf4dd;
+  --paper-dark: #e6dcbe;
+  --it: #e63946;
+  --it-dark: #b51d2a;
+  --tag: #ffd60a;
+  --tag-dark: #d9b500;
+  --cool: #2c6df4;
+  --cool-dark: #1f54c4;
+  --pink: #ff6b9d;
+  --pink-dark: #e0467c;
+  --mint: #7cfc00;
+  --mint-dark: #5cc400;
+  --white: #ffffff;
+  --shadow-hard: 4px 4px 0 var(--ink);
+  --shadow-loud: 6px 6px 0 var(--ink);
+  --shadow-mega: 8px 8px 0 var(--ink);
+  --radius-chunky: 0;
+  --border-chunky: 4px solid var(--ink);
+  --border-loud: 6px solid var(--ink);
+
+  --font-impact: 'Bangers', 'Knewave', 'Impact', sans-serif;
+  --font-shout: 'Knewave', 'Bangers', sans-serif;
+  --font-marker: 'Permanent Marker', 'Knewave', cursive;
+  --font-body: 'Archivo Black', 'Inter', system-ui, sans-serif;
+  --font-prose: 'Inter', system-ui, sans-serif;
+}
+
+// ─── Root layout ────────────────────────────────────────────────────────────
+
+.tyi-root {
+  width: 100%;
+  height: 100%;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-prose);
+  font-weight: 700;
+  position: relative;
+  overflow: hidden;
+  // Background halftone (subtle texture, fixed across all screens)
+  background-image:
+    radial-gradient(circle at 0.5px 0.5px, rgba(17, 17, 17, 0.18) 1px, transparent 1.2px);
+  background-size: 8px 8px;
+  background-position: 0 0;
+}
+
+.tyi-stage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.tyi-stage__scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 16px 20px 100px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tyi-stage__header {
+  flex: 0 0 auto;
+  padding: 14px 16px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  z-index: 2;
+}
+
+.tyi-stage__footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 12px 16px env(safe-area-inset-bottom, 12px);
+  background: linear-gradient(180deg, transparent 0%, var(--paper) 40%);
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+// ─── Watermark ──────────────────────────────────────────────────────────────
+
+.tyi-watermark {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 56px;
+  opacity: 0.32;
+  z-index: 1;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+
+  img {
+    width: 100%;
+    height: auto;
+    filter: invert(1) brightness(0); // turn white SVG into ink
+  }
+}
+
+// ─── Comic Panel ────────────────────────────────────────────────────────────
+
+.tyi-panel {
+  position: relative;
+  background: var(--white);
+  border: var(--border-loud);
+  box-shadow: var(--shadow-mega);
+  padding: 16px;
+  overflow: hidden;
+
+  &--paper { background: var(--paper-light); }
+  &--tag { background: var(--tag); }
+  &--it { background: var(--it); color: var(--white); }
+  &--cool { background: var(--cool); color: var(--white); }
+  &--pink { background: var(--pink); color: var(--white); }
+  &--mint { background: var(--mint); }
+}
+
+.tyi-panel__caption {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: var(--paper);
+  color: var(--ink);
+  border-right: var(--border-chunky);
+  border-bottom: var(--border-chunky);
+  font-family: var(--font-marker);
+  padding: 4px 14px 4px 10px;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+}
+
+// ─── Sticker (chunky rounded label) ─────────────────────────────────────────
+
+.tyi-sticker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--tag);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  box-shadow: 3px 3px 0 var(--ink);
+  font-family: var(--font-impact);
+  font-size: 16px;
+  letter-spacing: 0.08em;
+  padding: 4px 10px;
+  text-transform: uppercase;
+
+  &--it { background: var(--it); color: var(--white); }
+  &--cool { background: var(--cool); color: var(--white); }
+  &--pink { background: var(--pink); color: var(--white); }
+  &--paper { background: var(--paper); color: var(--ink); }
+  &--small { font-size: 13px; padding: 2px 8px; box-shadow: 2px 2px 0 var(--ink); }
+}
+
+// ─── Buttons ────────────────────────────────────────────────────────────────
+
+.tyi-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--tag);
+  color: var(--ink);
+  border: var(--border-loud);
+  box-shadow: var(--shadow-loud);
+  font-family: var(--font-impact);
+  font-size: 26px;
+  letter-spacing: 0.06em;
+  padding: 14px 22px;
+  text-transform: uppercase;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.06s ease-out, box-shadow 0.06s ease-out;
+  touch-action: manipulation;
+
+  &:active {
+    transform: translate(4px, 4px);
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+
+  &--it { background: var(--it); color: var(--white); }
+  &--cool { background: var(--cool); color: var(--white); }
+  &--pink { background: var(--pink); color: var(--white); }
+  &--paper { background: var(--paper); color: var(--ink); }
+  &--white { background: var(--white); color: var(--ink); }
+  &--ghost {
+    background: transparent;
+    box-shadow: none;
+    border: 3px solid var(--ink);
+    font-size: 18px;
+    padding: 8px 14px;
+  }
+
+  &--block { width: 100%; }
+  &--small { font-size: 18px; padding: 8px 14px; border-width: 4px; box-shadow: 3px 3px 0 var(--ink); }
+
+  &[disabled] {
+    background: var(--paper-dark);
+    color: var(--ink-soft);
+    cursor: not-allowed;
+    box-shadow: 3px 3px 0 var(--ink);
+    opacity: 0.7;
+  }
+}
+
+// ─── Avatar ─────────────────────────────────────────────────────────────────
+
+.tyi-avatar {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+  border: 3px solid var(--ink);
+  background: var(--paper-light);
+  overflow: hidden;
+  border-radius: 50%;
+  box-shadow: 3px 3px 0 var(--ink);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+}
+
+.tyi-avatar__initials {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-impact);
+  font-size: 26px;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  background: var(--paper);
+}
+
+.tyi-avatar__halftone {
+  position: absolute;
+  inset: 0;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+// ─── Common type ────────────────────────────────────────────────────────────
+
+.tyi-shout {
+  font-family: var(--font-shout);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.tyi-impact {
+  font-family: var(--font-impact);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.tyi-marker {
+  font-family: var(--font-marker);
+  letter-spacing: 0.02em;
+}
+
+// ─── Animations ─────────────────────────────────────────────────────────────
+
+@keyframes tyi-shake {
+  0%, 100% { transform: translate(0, 0) rotate(0); }
+  10% { transform: translate(-3px, 1px) rotate(-0.6deg); }
+  20% { transform: translate(2px, -2px) rotate(0.8deg); }
+  30% { transform: translate(-2px, 2px) rotate(-0.4deg); }
+  40% { transform: translate(3px, 1px) rotate(0.6deg); }
+  55% { transform: translate(-2px, -1px) rotate(-0.6deg); }
+  70% { transform: translate(2px, 2px) rotate(0.4deg); }
+  85% { transform: translate(-1px, -2px) rotate(0); }
+}
+
+@keyframes tyi-pop {
+  0% { transform: scale(0) rotate(-20deg); opacity: 0; }
+  55% { transform: scale(1.18) rotate(4deg); opacity: 1; }
+  75% { transform: scale(0.94) rotate(-2deg); }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+@keyframes tyi-slam {
+  0% { transform: translateY(-300px) rotate(-25deg) scale(1.6); opacity: 0; }
+  60% { transform: translateY(0) rotate(0) scale(1.05); opacity: 1; }
+  72% { transform: translateY(-12px) rotate(2deg) scale(0.98); }
+  84% { transform: translateY(0) rotate(-1deg) scale(1.03); }
+  100% { transform: translateY(0) rotate(0) scale(1); }
+}
+
+@keyframes tyi-wobble {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-2.5deg); }
+  75% { transform: rotate(2.5deg); }
+}
+
+@keyframes tyi-confetti-rise {
+  0% { transform: translate(var(--tx), var(--ty0)) rotate(0); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translate(var(--tx), var(--ty1)) rotate(var(--rot)); opacity: 0; }
+}
+
+@keyframes tyi-jitter {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(1px, -1px); }
+  50% { transform: translate(-1px, 1px); }
+  75% { transform: translate(1px, 1px); }
+}
+
+@keyframes tyi-tag-blink {
+  0%, 60% { opacity: 1; }
+  30% { opacity: 0.6; }
+}
+
+@keyframes tyi-arrival {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tyi-arrival-pop {
+  0% { opacity: 0; transform: scale(0.6); }
+  60% { opacity: 1; transform: scale(1.08); }
+  100% { opacity: 1; transform: scale(1); }
+}
