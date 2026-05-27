@@ -147,6 +147,10 @@ function TagYoureItInner() {
 
   const [screen, setScreen] = useState<Screen>('lobby');
   const [targetId, setTargetId] = useState<string | null>(null);
+  // Synthetic contact for tag-back when the sender isn't in our
+  // contact list. Lets the move screen render without forcing the
+  // sender into the contacts array. Cleared on goToLobby.
+  const [syntheticTarget, setSyntheticTarget] = useState<AigramContact | null>(null);
   const [moveId, setMoveId] = useState<MoveId | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [genErrored, setGenErrored] = useState(false);
@@ -163,13 +167,16 @@ function TagYoureItInner() {
 
   // Demo override — applies state for screenshot URLs
   const isDemoView = !!demoMode;
-  const target = contacts.find((c) => c.telegram_id === targetId) || null;
+  const target =
+    contacts.find((c) => c.telegram_id === targetId) ||
+    (syntheticTarget && syntheticTarget.telegram_id === targetId ? syntheticTarget : null);
   const move = getMoveSpec(moveId);
 
   // ── Flow controls ────────────────────────────────────────────────────
   const goToLobby = useCallback(() => {
     setScreen('lobby');
     setTargetId(null);
+    setSyntheticTarget(null);
     setMoveId(null);
     setImageUrl(null);
     setGenErrored(false);
@@ -287,15 +294,22 @@ function TagYoureItInner() {
   // ── Tag-back shortcut from wall ──────────────────────────────────────
   const onTagBack = useCallback(
     (incoming: IncomingTag) => {
-      // If sender exists in our contact list, pre-select them; otherwise we
-      // still create a synthetic contact entry so the flow works.
       const existing = contacts.find((c) => c.telegram_id === incoming.sender_id);
       if (existing) {
         setTargetId(existing.telegram_id);
+        setSyntheticTarget(null);
       } else {
-        // The picker won't show this synthetic; but we can still tag them by
-        // jumping straight to move picker.
+        // Sender isn't in contacts (Aigram contact list returned ≠ tag senders).
+        // Build a synthetic contact from the tag's sender metadata so the move
+        // screen can render — otherwise `target` resolves to null and the
+        // screen-gate `screen === 'move' && target` would short-circuit to a
+        // blank page.
         setTargetId(incoming.sender_id);
+        setSyntheticTarget({
+          telegram_id: incoming.sender_id,
+          name: incoming.sender_name,
+          head_url: incoming.sender_avatar,
+        });
       }
       setScreen('move');
     },

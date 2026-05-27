@@ -63,29 +63,30 @@ export default function ContactPicker({
           <div className="tyi-picker__empty tyi-prose">{t('picker.empty')}</div>
         )}
 
-        <div className="tyi-picker__grid">
+        <ul className="tyi-picker__list">
           {contacts.map((c, i) => {
             const isSelected = selectedId === c.telegram_id;
             return (
-              <button
-                key={c.telegram_id}
-                className={`tyi-picker__card ${isSelected ? 'tyi-picker__card--sel' : ''}`}
-                onPointerDown={(e) => {
-                  e.preventDefault();
-                  onSelect(c.telegram_id);
-                }}
-              >
-                <Avatar src={c.head_url} name={c.name} size={64} tilt={i % 3 === 0 ? -4 : 4} />
-                <div className="tyi-picker__name tyi-prose-strong">{c.name}</div>
-                {isSelected && (
-                  <div className="tyi-picker__pick tyi-prose-strong">
-                    {t('picker.picked_badge')}
-                  </div>
-                )}
-              </button>
+              <li key={c.telegram_id}>
+                <button
+                  className={`tyi-picker__row ${isSelected ? 'tyi-picker__row--sel' : ''}`}
+                  onPointerDown={(e) => {
+                    e.preventDefault();
+                    onSelect(c.telegram_id);
+                  }}
+                >
+                  <Avatar src={c.head_url} name={c.name} size={48} tilt={i % 3 === 0 ? -4 : 4} />
+                  <span className="tyi-picker__row-name tyi-prose-strong">{c.name}</span>
+                  {isSelected && (
+                    <span className="tyi-picker__row-pick tyi-prose-strong">
+                      {t('picker.picked_badge')}
+                    </span>
+                  )}
+                </button>
+              </li>
             );
           })}
-        </div>
+        </ul>
       </div>
 
       <div className="tyi-stage__footer">
@@ -138,55 +139,60 @@ function PickerStyles() {
         padding: 32px 0;
         color: var(--ink-soft);
       }
-      .tyi-picker__grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-        margin-top: 14px;
+      .tyi-picker__list {
+        list-style: none;
+        margin: 14px 0 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
       }
-      .tyi-picker__card {
-        position: relative;
+      .tyi-picker__list > li {
+        width: 100%;
+      }
+      .tyi-picker__row {
+        width: 100%;
         background: var(--white);
         border: 4px solid var(--ink);
         box-shadow: 4px 4px 0 var(--ink);
-        padding: 12px 8px 10px;
+        padding: 10px 14px;
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         align-items: center;
-        gap: 6px;
+        gap: 14px;
         cursor: pointer;
         font-family: var(--font-impact);
         text-transform: uppercase;
-        font-size: 14px;
+        text-align: left;
         transition: transform 0.06s, box-shadow 0.06s;
+        min-width: 0; /* allow children to shrink so ellipsis works */
       }
-      .tyi-picker__card:active {
+      .tyi-picker__row:active {
         transform: translate(2px, 2px);
         box-shadow: 2px 2px 0 var(--ink);
       }
-      .tyi-picker__card--sel {
+      .tyi-picker__row--sel {
         background: var(--tag);
         transform: translate(2px, 2px) rotate(-1deg);
         box-shadow: 2px 2px 0 var(--ink), -3px -3px 0 var(--it);
       }
-      .tyi-picker__name {
-        font-size: 14px;
-        max-width: 100%;
+      .tyi-picker__row-name {
+        flex: 1 1 auto;
+        min-width: 0;
+        font-size: 17px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
       }
-      .tyi-picker__pick {
-        position: absolute;
-        top: -10px;
-        right: -8px;
+      .tyi-picker__row-pick {
+        flex: 0 0 auto;
         background: var(--it);
         color: var(--white);
         border: 3px solid var(--ink);
         box-shadow: 2px 2px 0 var(--ink);
         font-size: 11px;
         padding: 3px 7px;
-        transform: rotate(8deg);
+        transform: rotate(4deg);
       }
     `;
     document.head.appendChild(el);
