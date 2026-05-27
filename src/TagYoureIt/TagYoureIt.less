@@ -38,6 +38,8 @@
 .tyi-root {
   width: 100%;
   height: 100%;
+  height: 100vh;
+  height: 100dvh;
   background: var(--paper);
   color: var(--ink);
   font-family: var(--font-prose);
@@ -51,6 +53,9 @@
   background-position: 0 0;
 }
 
+// Stage = full-height flex column. Header (intrinsic) + Scroll (1fr) +
+// Footer (intrinsic) so the footer can never overflow the viewport,
+// regardless of how tall its CTA button + safe-area inset add up to.
 .tyi-stage {
   position: absolute;
   inset: 0;
@@ -60,10 +65,11 @@
 }
 
 .tyi-stage__scroll {
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0; // so the flex item can actually shrink and scroll
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 16px 20px 100px;
+  padding: 16px 20px 20px;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -77,17 +83,31 @@
   z-index: 2;
 }
 
+// Footer is flex 0 0 auto — sits naturally at the bottom and is
+// always fully visible. Gradient fade pseudo-element extends above
+// it so scroll content seems to dissolve into the footer.
 .tyi-stage__footer {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 12px 16px env(safe-area-inset-bottom, 12px);
-  background: linear-gradient(180deg, transparent 0%, var(--paper) 40%);
+  flex: 0 0 auto;
+  position: relative;
+  padding: 12px 16px max(env(safe-area-inset-bottom, 0px), 12px);
+  background: var(--paper);
   z-index: 3;
   display: flex;
   flex-direction: column;
   gap: 8px;
+
+  // Fade above the footer — gives the impression scroll content
+  // dissolves into the footer instead of being cut off mid-line.
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -22px;
+    height: 22px;
+    background: linear-gradient(180deg, transparent 0%, var(--paper) 100%);
+    pointer-events: none;
+  }
 }
 
 // ─── Watermark ──────────────────────────────────────────────────────────────
