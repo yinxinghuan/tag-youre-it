@@ -32,6 +32,16 @@ import type {
 
 const LS_KEY = 'tag-youre-it-save';
 
+// Set `window.__TYI_DEBUG__ = true` (or visit with `?debug=1`) to surface the
+// sender-resolver pipeline in the console — used for triaging "sender shows
+// raw telegram_id instead of name" reports.
+if (typeof window !== 'undefined') {
+  const w = window as { __TYI_DEBUG__?: boolean };
+  if (new URLSearchParams(window.location.search).get('debug') === '1') {
+    w.__TYI_DEBUG__ = true;
+  }
+}
+
 const DEFAULT_SAVE: TagSave = {
   outgoing: [],
   acknowledged_incoming_ts: 0,
@@ -221,29 +231,64 @@ export function useTagState(contacts: AigramContact[] = []): UseTagState {
   }
 
   function resolveUser(id: string, rowName?: string, rowAvatar?: string): ResolvedUser {
+    const debug = (window as { __TYI_DEBUG__?: boolean }).__TYI_DEBUG__;
     // 1. Trust the row's own user_name/head_url when present + non-blank
     if (rowName && rowName !== id) {
+      if (debug) console.info('[tyi-resolve]', id, '→ row metadata:', rowName);
       return { name: rowName, head_url: rowAvatar || '' };
     }
     // 2. Look up the player's own contacts (covers the common "tagged by a friend" case)
     const c = contactById.get(id);
-    if (c) return { name: c.name, head_url: c.head_url };
+    if (c) {
+      if (debug) console.info('[tyi-resolve]', id, '→ contacts:', c.name);
+      return { name: c.name, head_url: c.head_url };
+    }
     // 3. Lazy-fetched cache (populated by the effect below)
     const cached = userCache[id];
-    if (cached) return cached;
+    if (cached) {
+      if (debug) console.info('[tyi-resolve]', id, '→ cache:', cached.name);
+      return cached;
+    }
     // 4. Last resort — show id as a placeholder so the UI doesn't crash. The
     //    fetch effect will populate the cache and trigger a re-render shortly.
+    if (debug) console.info('[tyi-resolve]', id, '→ FALLBACK to id (row.user_name=', rowName, ', contacts has?', contactById.has(id), ', cache has?', !!userCache[id], ')');
     return { name: rowName || id, head_url: rowAvatar || '' };
   }
 
-  // Derived: scan all-user saves for tags whose target_id == me
+  // Derived: scan all-user saves for tags whose target_id == me.
+  //
+  // The platform's get/data/list returns the latest save row from the 6
+  // most-active users. Two consequences:
+  //   1. My own row may or may not be in `allSaves` (depends on activity rank).
+  //   2. Even if it is, the snapshot is from the last `refresh()` — it won't
+  //      include a tag I just sent in this session because cloud-persist is
+  //      debounced + fire-and-forget; allSaves doesn't auto-update.
+  // So we layer my local `save` over the scan so a tag I just sent appears
+  // immediately in the wall (no wait for cloud roundtrip + refresh).
+  const rowsById = new Map<string, AllSaveRow>();
+  for (const row of allSaves) {
+    rowsById.set(String(row.user_id), row);
+  }
+  if (telegramId && save.outgoing.length > 0) {
+    rowsById.set(telegramId, {
+      user_id: telegramId,
+      time: '0',
+      resource_data: JSON.stringify(save),
+    } as AllSaveRow);
+  }
+
   const incoming: IncomingTag[] = [];
   const wall: IncomingTag[] = [];
-  for (const row of allSaves) {
+  for (const row of rowsById.values()) {
     const parsed = parseSave(row);
     if (!parsed?.outgoing) continue;
     const senderId = String(row.user_id);
-    const resolved = resolveUser(senderId, row.user_name, row.head_url);
+    // For my own row use a self-resolved name so the wall doesn't show me as
+    // a placeholder id while contacts/cache fills in.
+    const resolved =
+      senderId === telegramId
+        ? { name: 'You', head_url: '' }
+        : resolveUser(senderId, row.user_name, row.head_url);
     for (const t of parsed.outgoing) {
       const item: IncomingTag = {
         ...t,
@@ -279,22 +324,33 @@ export function useTagState(contacts: AigramContact[] = []): UseTagState {
     if (need.size === 0) return;
     for (const id of need) {
       inflightRef.current.add(id);
-      callAigramAPI<AigramResponse<{ name: string; head_url: string }>>(
+      callAigramAPI<unknown>(
         `/note/telegram/user/get/info/by/telegram_id?telegram_id=${encodeURIComponent(id)}`,
         'GET',
       )
         .then((res) => {
-          const data = res?.data;
-          if (data && (data.name || data.head_url)) {
+          // Defensive shape unwrap: platform sometimes returns
+          // `{retcode, msg, data: {name, head_url}}`, sometimes the user
+          // object directly. Try both, mirror agent-string's pattern.
+          const raw = res as { data?: unknown } | null | undefined;
+          const inner = (raw && (raw.data as unknown)) ?? (raw as unknown);
+          const ud = (inner ?? {}) as { name?: string; head_url?: string };
+          const debug = (window as { __TYI_DEBUG__?: boolean }).__TYI_DEBUG__;
+          if (debug) {
+            console.info('[tyi-resolve]', id, 'res=', JSON.stringify(res));
+            console.info('[tyi-resolve]', id, 'unwrapped=', JSON.stringify(ud));
+          }
+          if (ud.name || ud.head_url) {
             setUserCache((prev) =>
               prev[id]
                 ? prev
-                : { ...prev, [id]: { name: data.name || id, head_url: data.head_url || '' } },
+                : { ...prev, [id]: { name: ud.name || id, head_url: ud.head_url || '' } },
             );
           }
         })
-        .catch(() => {
-          /* silent — leave as id fallback */
+        .catch((err) => {
+          const debug = (window as { __TYI_DEBUG__?: boolean }).__TYI_DEBUG__;
+          if (debug) console.warn('[tyi-resolve]', id, 'FAIL', err);
         })
         .finally(() => {
           inflightRef.current.delete(id);
