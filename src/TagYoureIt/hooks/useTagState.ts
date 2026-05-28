@@ -23,6 +23,7 @@ import {
 } from '@shared/runtime';
 import { getGameUuid } from '@shared/runtime';
 import type {
+  AigramContact,
   AllUserSave,
   IncomingTag,
   OutgoingTag,
@@ -106,13 +107,39 @@ function parseSave(row: AllSaveRow): TagSave | null {
   }
 }
 
-export function useTagState(): UseTagState {
+interface ResolvedUser {
+  name: string;
+  head_url: string;
+}
+
+interface UserCache {
+  [id: string]: ResolvedUser;
+}
+
+/**
+ * Tag, You're It master state.
+ *
+ * `contacts` is passed in so we can resolve sender_id → {name, head_url} from
+ * the player's contact list. The platform's get/data/list response includes
+ * `user_name` / `head_url` only sometimes — when absent we'd otherwise display
+ * the raw telegram_id as the sender name (visible bug + breaks tag-back since
+ * the synthetic contact built by the parent inherits that bad name).
+ *
+ * Resolution order, per sender_id:
+ *   1. row.user_name / row.head_url if present on the save row
+ *   2. contacts entry with matching telegram_id
+ *   3. one-shot fetch of /note/telegram/user/get/info/by/telegram_id (cached)
+ *   4. fall back to id as last-resort label
+ */
+export function useTagState(contacts: AigramContact[] = []): UseTagState {
   const [save, setSave] = useState<TagSave>(() => loadLocal());
   const [allSaves, setAllSaves] = useState<AllSaveRow[]>([]);
+  const [userCache, setUserCache] = useState<UserCache>({});
   const [loaded, setLoaded] = useState(false);
   const sessionId = getGameUuid();
   const canSync = isInAigram && !!sessionId && !!telegramId;
   const cloudTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const inflightRef = useRef<Set<string>>(new Set());
 
   // Initial fetch: cloud my-save + all-users-saves
   const refresh = useCallback(async () => {
@@ -187,6 +214,28 @@ export function useTagState(): UseTagState {
     });
   }, [persist]);
 
+  // Build a contact-id → contact lookup for O(1) resolution.
+  const contactById = new Map<string, AigramContact>();
+  for (const c of contacts) {
+    contactById.set(String(c.telegram_id), c);
+  }
+
+  function resolveUser(id: string, rowName?: string, rowAvatar?: string): ResolvedUser {
+    // 1. Trust the row's own user_name/head_url when present + non-blank
+    if (rowName && rowName !== id) {
+      return { name: rowName, head_url: rowAvatar || '' };
+    }
+    // 2. Look up the player's own contacts (covers the common "tagged by a friend" case)
+    const c = contactById.get(id);
+    if (c) return { name: c.name, head_url: c.head_url };
+    // 3. Lazy-fetched cache (populated by the effect below)
+    const cached = userCache[id];
+    if (cached) return cached;
+    // 4. Last resort — show id as a placeholder so the UI doesn't crash. The
+    //    fetch effect will populate the cache and trigger a re-render shortly.
+    return { name: rowName || id, head_url: rowAvatar || '' };
+  }
+
   // Derived: scan all-user saves for tags whose target_id == me
   const incoming: IncomingTag[] = [];
   const wall: IncomingTag[] = [];
@@ -194,14 +243,13 @@ export function useTagState(): UseTagState {
     const parsed = parseSave(row);
     if (!parsed?.outgoing) continue;
     const senderId = String(row.user_id);
-    const senderName = row.user_name || senderId;
-    const senderAvatar = row.head_url || '';
+    const resolved = resolveUser(senderId, row.user_name, row.head_url);
     for (const t of parsed.outgoing) {
       const item: IncomingTag = {
         ...t,
         sender_id: senderId,
-        sender_name: senderName,
-        sender_avatar: senderAvatar,
+        sender_name: resolved.name,
+        sender_avatar: resolved.head_url,
       };
       wall.push(item);
       if (telegramId && t.target_id === telegramId && senderId !== telegramId) {
@@ -211,6 +259,49 @@ export function useTagState(): UseTagState {
   }
   incoming.sort((a, b) => b.ts - a.ts);
   wall.sort((a, b) => b.ts - a.ts);
+
+  // Side effect: for any sender_id that resolveUser can't satisfy from row
+  // metadata + contacts + cache, fetch user info once and cache it. Triggers
+  // a re-render once cache updates so the UI swaps id → real name/avatar.
+  useEffect(() => {
+    if (!isInAigram) return;
+    const need = new Set<string>();
+    for (const row of allSaves) {
+      const id = String(row.user_id);
+      if (id === telegramId) continue;
+      // Skip ids we've already resolved
+      if (row.user_name && row.user_name !== id) continue;
+      if (contactById.has(id)) continue;
+      if (userCache[id]) continue;
+      if (inflightRef.current.has(id)) continue;
+      need.add(id);
+    }
+    if (need.size === 0) return;
+    for (const id of need) {
+      inflightRef.current.add(id);
+      callAigramAPI<AigramResponse<{ name: string; head_url: string }>>(
+        `/note/telegram/user/get/info/by/telegram_id?telegram_id=${encodeURIComponent(id)}`,
+        'GET',
+      )
+        .then((res) => {
+          const data = res?.data;
+          if (data && (data.name || data.head_url)) {
+            setUserCache((prev) =>
+              prev[id]
+                ? prev
+                : { ...prev, [id]: { name: data.name || id, head_url: data.head_url || '' } },
+            );
+          }
+        })
+        .catch(() => {
+          /* silent — leave as id fallback */
+        })
+        .finally(() => {
+          inflightRef.current.delete(id);
+        });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allSaves, contacts]);
 
   const newestIncoming = incoming[0] || null;
   const isIt = !!newestIncoming && newestIncoming.ts > save.acknowledged_incoming_ts;

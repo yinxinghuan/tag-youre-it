@@ -103,6 +103,144 @@ export function BananaIcon({ size = 40 }: IconProps) {
   );
 }
 
+export function AnvilIcon({ size = 40 }: IconProps) {
+  return (
+    <svg viewBox="0 0 40 40" width={size} height={size}>
+      {/* Body */}
+      <path
+        d="M6 16 H34 V22 H30 L28 28 H12 L10 22 H6 Z"
+        fill="#6b7280"
+        stroke="#111"
+        strokeWidth="2.5"
+        strokeLinejoin="round"
+      />
+      {/* Horn */}
+      <path
+        d="M34 16 Q38 16 38 19 Q38 22 34 22"
+        fill="#6b7280"
+        stroke="#111"
+        strokeWidth="2.5"
+      />
+      {/* Top plate */}
+      <rect x="8" y="10" width="24" height="6" fill="#9ca3af" stroke="#111" strokeWidth="2.5" />
+      {/* Highlight on top */}
+      <rect x="11" y="11" width="14" height="1.5" fill="#e5e7eb" />
+    </svg>
+  );
+}
+
+export function GloveIcon({ size = 40 }: IconProps) {
+  return (
+    <svg viewBox="0 0 40 40" width={size} height={size}>
+      {/* Spring zig-zag */}
+      <path
+        d="M4 36 L8 32 L4 28 L8 24 L4 20"
+        stroke="#111"
+        strokeWidth="2.5"
+        fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* Glove body */}
+      <path
+        d="M10 22 Q10 14 18 14 Q26 14 30 18 Q36 22 36 28 Q36 32 32 32 Q28 32 26 30 Q22 32 18 32 Q10 32 10 22 Z"
+        fill="#e63946"
+        stroke="#111"
+        strokeWidth="2.5"
+        strokeLinejoin="round"
+      />
+      {/* Wrist cuff */}
+      <path d="M10 22 L8 22 L8 26 L10 26" fill="#b51d2a" stroke="#111" strokeWidth="2" />
+      {/* Highlight */}
+      <ellipse cx="22" cy="20" rx="6" ry="2" fill="#ff8a95" opacity="0.5" />
+    </svg>
+  );
+}
+
+export function PaintIcon({ size = 40 }: IconProps) {
+  return (
+    <svg viewBox="0 0 40 40" width={size} height={size}>
+      {/* Can */}
+      <path
+        d="M10 6 L30 6 L28 22 L12 22 Z"
+        fill="#9b59b6"
+        stroke="#111"
+        strokeWidth="2.5"
+        strokeLinejoin="round"
+      />
+      {/* Rim */}
+      <ellipse cx="20" cy="6" rx="10" ry="2.5" fill="#bd80d3" stroke="#111" strokeWidth="2.5" />
+      {/* Handle (sideways) */}
+      <path d="M30 9 Q34 12 30 14" stroke="#111" strokeWidth="2" fill="none" />
+      {/* Drips */}
+      <path d="M14 22 Q14 30 16 32 Q18 34 18 28 Q18 24 14 22" fill="#9b59b6" stroke="#111" strokeWidth="2" strokeLinejoin="round" />
+      <path d="M22 22 Q22 34 24 36 Q26 38 26 30 Q26 26 22 22" fill="#ff6b9d" stroke="#111" strokeWidth="2" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function WaterIcon({ size = 40 }: IconProps) {
+  return (
+    <svg viewBox="0 0 40 40" width={size} height={size}>
+      {/* Main droplet/balloon */}
+      <path
+        d="M20 6 Q12 18 12 26 Q12 34 20 34 Q28 34 28 26 Q28 18 20 6 Z"
+        fill="#2c6df4"
+        stroke="#111"
+        strokeWidth="2.5"
+        strokeLinejoin="round"
+      />
+      {/* Knot at top */}
+      <path d="M18 6 Q20 3 22 6" stroke="#111" strokeWidth="2.5" fill="none" />
+      {/* Highlight */}
+      <ellipse cx="16" cy="20" rx="2" ry="5" fill="#7fa8ff" opacity="0.7" />
+      {/* Splash droplets */}
+      <circle cx="6" cy="14" r="1.5" fill="#2c6df4" stroke="#111" strokeWidth="1.5" />
+      <circle cx="34" cy="16" r="1.5" fill="#2c6df4" stroke="#111" strokeWidth="1.5" />
+      <circle cx="4" cy="28" r="1.2" fill="#2c6df4" stroke="#111" strokeWidth="1.2" />
+    </svg>
+  );
+}
+
+export function HornIcon({ size = 40 }: IconProps) {
+  return (
+    <svg viewBox="0 0 40 40" width={size} height={size}>
+      {/* Horn cone */}
+      <path
+        d="M4 14 L4 26 L20 30 L20 10 Z"
+        fill="#ffd60a"
+        stroke="#111"
+        strokeWidth="2.5"
+        strokeLinejoin="round"
+      />
+      {/* Mouthpiece */}
+      <rect x="20" y="16" width="6" height="8" fill="#444" stroke="#111" strokeWidth="2" />
+      {/* Sound waves */}
+      <path d="M28 14 Q32 20 28 26" stroke="#111" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+      <path d="M32 10 Q38 20 32 30" stroke="#111" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function GlitterIcon({ size = 40 }: IconProps) {
+  return (
+    <svg viewBox="0 0 40 40" width={size} height={size}>
+      {/* Big star */}
+      <path
+        d="M20 6 L23 16 L33 16 L25 22 L28 32 L20 26 L12 32 L15 22 L7 16 L17 16 Z"
+        fill="#ff6b9d"
+        stroke="#111"
+        strokeWidth="2.5"
+        strokeLinejoin="round"
+      />
+      {/* Small sparkles */}
+      <path d="M6 8 L7 11 L10 12 L7 13 L6 16 L5 13 L2 12 L5 11 Z" fill="#ffd60a" stroke="#111" strokeWidth="1" />
+      <path d="M34 8 L35 10 L37 11 L35 12 L34 14 L33 12 L31 11 L33 10 Z" fill="#7cfc00" stroke="#111" strokeWidth="1" />
+      <path d="M34 30 L35 32 L37 33 L35 34 L34 36 L33 34 L31 33 L33 32 Z" fill="#2c6df4" stroke="#111" strokeWidth="1" />
+    </svg>
+  );
+}
+
 const ICON_MAP: Record<MoveId, (p: IconProps) => JSX.Element> = {
   pie: PieIcon,
   slime: SlimeIcon,
@@ -110,6 +248,12 @@ const ICON_MAP: Record<MoveId, (p: IconProps) => JSX.Element> = {
   sticker: StickerIcon,
   pizza: PizzaIcon,
   banana: BananaIcon,
+  anvil: AnvilIcon,
+  glove: GloveIcon,
+  paint: PaintIcon,
+  water: WaterIcon,
+  horn: HornIcon,
+  glitter: GlitterIcon,
 };
 
 export function MoveIcon({ id, size = 40 }: { id: MoveId; size?: number }) {

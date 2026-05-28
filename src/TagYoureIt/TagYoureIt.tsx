@@ -141,7 +141,7 @@ function TagYoureItInner() {
 
   const demoMode = useMemo(readDemoMode, []);
   const { contacts, loading: contactsLoading, isDemo } = useAigramContacts();
-  const tagState = useTagState();
+  const tagState = useTagState(contacts);
   const { generate, loading: generating, lastUrl, error: genError } = useGenImage();
   const { trigger, canEmit } = useGameEvent();
 

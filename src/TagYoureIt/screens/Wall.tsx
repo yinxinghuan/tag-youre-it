@@ -11,12 +11,15 @@ import type { IncomingTag, MoveId } from '../types';
 function WallNoArt({ move, targetName }: { move: MoveId; targetName: string }) {
   const spec = MOVES.find((m) => m.id === move);
   const palette: Record<string, string> = {
-    cream: '#ffd60a', // bump cream → tag yellow so it doesn't fade into paper bg
-    green: '#7cfc00',
-    pink: '#ff6b9d',
+    cream:  '#ffd60a', // bump cream → tag yellow so it doesn't fade into paper bg
+    green:  '#7cfc00',
+    pink:   '#ff6b9d',
     yellow: '#ffd60a',
-    red: '#e63946',
-    blue: '#2c6df4',
+    red:    '#e63946',
+    blue:   '#2c6df4',
+    steel:  '#9ca3af',
+    punch:  '#f97316',
+    purple: '#9b59b6',
   };
   const bg = (spec && palette[spec.color]) || '#ffd60a';
   return (

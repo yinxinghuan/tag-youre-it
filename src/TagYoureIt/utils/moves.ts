@@ -11,7 +11,16 @@ export interface MoveSpec {
   /** Notification body template ({sender} replaced server-side?) */
   msg: string;
   /** Background color used on this move's chip */
-  color: 'red' | 'green' | 'pink' | 'yellow' | 'blue' | 'cream';
+  color:
+    | 'red'
+    | 'green'
+    | 'pink'
+    | 'yellow'
+    | 'blue'
+    | 'cream'
+    | 'steel'
+    | 'punch'
+    | 'purple';
   /** AI image prompt — always English */
   prompt: string;
 }
@@ -76,6 +85,66 @@ export const MOVES: MoveSpec[] = [
     color: 'blue',
     prompt:
       'a person slipping on a banana peel, mid-air pratfall, legs up, comic book pop art, halftone dots, bold black outlines, classic slapstick',
+  },
+  {
+    id: 'anvil',
+    num: '07',
+    shout: 'CLANG!',
+    desc: 'Acme anvil drop',
+    msg: '{sender} just dropped an Acme anvil on your head. YOU\'RE IT!',
+    color: 'steel',
+    prompt:
+      'an Acme cast iron anvil falling onto a person\'s head from above, dazed expression, stars and birds circling around the head, comic book pop art, halftone dots, bold black outlines, Lichtenstein style',
+  },
+  {
+    id: 'glove',
+    num: '08',
+    shout: 'BOP!',
+    desc: 'Spring-loaded boxing glove',
+    msg: '{sender} just sprung a boxing glove out of nowhere and BOP\'d you. YOU\'RE IT!',
+    color: 'punch',
+    prompt:
+      'a giant red boxing glove on a coiled spring punching a person square in the face, cheeks puffing outward, comic book pop art, halftone dots, bold black outlines, Lichtenstein style',
+  },
+  {
+    id: 'paint',
+    num: '09',
+    shout: 'SPLOOT!',
+    desc: 'Paint can dump',
+    msg: '{sender} just upturned a giant paint can over your head. YOU\'RE IT!',
+    color: 'purple',
+    prompt:
+      'a person under an overturned paint can with thick rainbow paint pouring down their head and shoulders, drips everywhere, comic book pop art, halftone dots, bold black outlines, Lichtenstein style',
+  },
+  {
+    id: 'water',
+    num: '10',
+    shout: 'SPLOOSH!',
+    desc: 'Water balloon burst',
+    msg: '{sender} just lobbed a giant water balloon at you. SPLOOSH! YOU\'RE IT!',
+    color: 'blue',
+    prompt:
+      'a person getting drenched by a giant water balloon bursting on their chest, water spraying outward in cartoon arcs, surprised expression, comic book pop art, halftone dots, bold black outlines, Lichtenstein style',
+  },
+  {
+    id: 'horn',
+    num: '11',
+    shout: 'HONK!',
+    desc: 'Giant air horn point-blank',
+    msg: '{sender} just HONK\'d a giant air horn point-blank at your face. YOU\'RE IT!',
+    color: 'yellow',
+    prompt:
+      'a person with their hair blown straight back by a giant cartoon air horn aimed at their face point-blank, concentric sound wave rings visible, eyes wide, comic book pop art, halftone dots, bold black outlines, Lichtenstein style',
+  },
+  {
+    id: 'glitter',
+    num: '12',
+    shout: 'SPARKLE!',
+    desc: 'Glitter bomb explosion',
+    msg: '{sender} just set off a glitter bomb in your face. YOU\'RE IT (and shiny)!',
+    color: 'pink',
+    prompt:
+      'a person covered head-to-toe in rainbow glitter from a glitter bomb explosion, sparkles flying outward, joyful chaos, comic book pop art, halftone dots, bold black outlines, Lichtenstein style',
   },
 ];
 

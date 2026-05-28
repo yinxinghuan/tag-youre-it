@@ -15,12 +15,15 @@ interface Props {
 }
 
 const COLOR_MAP: Record<string, { bg: string; text: string }> = {
-  cream: { bg: '#fff4d9', text: '#111' },
-  green: { bg: '#7cfc00', text: '#111' },
-  pink: { bg: '#ff6b9d', text: '#fff' },
+  cream:  { bg: '#fff4d9', text: '#111' },
+  green:  { bg: '#7cfc00', text: '#111' },
+  pink:   { bg: '#ff6b9d', text: '#fff' },
   yellow: { bg: '#ffd60a', text: '#111' },
-  red: { bg: '#e63946', text: '#fff' },
-  blue: { bg: '#2c6df4', text: '#fff' },
+  red:    { bg: '#e63946', text: '#fff' },
+  blue:   { bg: '#2c6df4', text: '#fff' },
+  steel:  { bg: '#9ca3af', text: '#111' },
+  punch:  { bg: '#f97316', text: '#fff' },
+  purple: { bg: '#9b59b6', text: '#fff' },
 };
 
 export default function MovePicker({

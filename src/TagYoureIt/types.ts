@@ -6,7 +6,13 @@ export type MoveId =
   | 'confetti'
   | 'sticker'
   | 'pizza'
-  | 'banana';
+  | 'banana'
+  | 'anvil'
+  | 'glove'
+  | 'paint'
+  | 'water'
+  | 'horn'
+  | 'glitter';
 
 export type Screen =
   | 'lobby'
