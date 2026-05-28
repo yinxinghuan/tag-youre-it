@@ -331,7 +331,7 @@ function TagYoureItInner() {
           <Lobby
             isIt={tagState.isIt}
             newestIncoming={tagState.newestIncoming}
-            incomingCount={tagState.incoming.length}
+            incomingCount={tagState.unreadIncomingCount}
             contactsCount={contacts.length}
             contacts={contacts}
             wallCount={tagState.wall.length}

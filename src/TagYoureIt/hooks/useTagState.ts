@@ -76,6 +76,9 @@ export interface UseTagState {
   save: TagSave;
   /** Tags directed at ME from other recent users */
   incoming: IncomingTag[];
+  /** Count of incoming tags newer than my last acknowledged_incoming_ts — i.e.
+   *  tags I haven't responded to yet. Drives the lobby's pending-tag badge. */
+  unreadIncomingCount: number;
   /** Newest unread incoming tag (drives "YOU'RE IT" lobby state) */
   newestIncoming: IncomingTag | null;
   /** Am I "IT"? (have unacknowledged incoming tag) */
@@ -361,10 +364,19 @@ export function useTagState(contacts: AigramContact[] = []): UseTagState {
 
   const newestIncoming = incoming[0] || null;
   const isIt = !!newestIncoming && newestIncoming.ts > save.acknowledged_incoming_ts;
+  // Count only tags newer than my last acknowledgement. After tag-back this
+  // drops to 0, which lets the lobby's pending-tag badge disappear (the
+  // total `incoming.length` includes historic tags I've already responded
+  // to — surfacing those as "pending" misleads the player into thinking
+  // there's still an action to take).
+  const unreadIncomingCount = incoming.filter(
+    (t) => t.ts > save.acknowledged_incoming_ts,
+  ).length;
 
   return {
     save,
     incoming,
+    unreadIncomingCount,
     newestIncoming,
     isIt,
     wall: wall.slice(0, 24),
