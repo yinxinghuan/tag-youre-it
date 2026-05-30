@@ -121,7 +121,10 @@ export default function Wall({ wall, myId, onTagBack, onBack }: Props) {
                       <button
                         className="tyi-btn tyi-btn--small tyi-btn--it"
                         style={{ marginTop: 6 }}
-                        onPointerDown={(e) => {
+                        // onClick — tag-back lives inside a scrollable wall
+                        // item; pointerdown fires before the browser
+                        // disambiguates tap from scroll. See scroll-vs-click skill.
+                        onClick={(e) => {
                           e.preventDefault();
                           onTagBack(item);
                         }}
