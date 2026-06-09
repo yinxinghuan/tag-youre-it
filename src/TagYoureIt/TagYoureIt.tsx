@@ -242,23 +242,19 @@ function TagYoureItInner() {
 
     // Fire platform notify event (only when in real Aigram with a real target)
     if (canEmit && target.telegram_id && !target.telegram_id.startsWith('demo')) {
-      const config = {
-        actions: [
-          {
-            type: 'notify',
-            target_user_id: target.telegram_id,
-            image: imageUrl
-              ? { url: imageUrl }
-              : { prompt: move.prompt, ref_url: target.head_url || undefined },
-            message: {
-              template: move.msg,
-              variables: ['sender_name'],
-              locale: 'en',
-            },
-          },
-        ],
+      // Spec: image is optional, but if present BOTH ref_url and prompt are
+      // required. Prefer the freshly-generated comic panel; fall back to the
+      // target's avatar; if neither exists, omit image entirely.
+      const refUrl = imageUrl || target.head_url || '';
+      const action: Record<string, unknown> = {
+        type: 'notify',
+        target_user_id: target.telegram_id,
+        message: { template: move.msg, variables: ['sender_name'] },
       };
-      trigger('tag_sent', config);
+      if (refUrl) {
+        action.image = { ref_url: refUrl, prompt: move.prompt };
+      }
+      trigger('tag_sent', { actions: [action] });
       setNotified(true);
     }
     // Clear pending so we don't double-fire
