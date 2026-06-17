@@ -7,6 +7,7 @@ import { ArrowIcon, MailIcon, ShareIcon } from '../utils/icons';
 import { relativeTime } from '../utils/format';
 import { getMoveSpec } from '../utils/moves';
 import { useLocale } from '../i18n';
+import { isInAigram } from '@shared/runtime';
 import type { IncomingTag, AigramContact } from '../types';
 
 interface LobbyProps {
@@ -149,7 +150,10 @@ export default function Lobby({
           </div>
         ) : (
           <div className="tyi-lobby__noFriends tyi-prose">
-            {t('lobby.no_friends')}
+            {/* Two distinct empty-state messages:
+                 - user opened OUTSIDE Aigram → tell them to open in Aigram
+                 - user IS in Aigram but has no contacts yet → invite friends */}
+            {isInAigram ? t('lobby.no_friends_yet') : t('lobby.no_friends')}
           </div>
         )}
 
