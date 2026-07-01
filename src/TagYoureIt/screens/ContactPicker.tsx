@@ -5,6 +5,8 @@ import { BackIcon } from '../utils/icons';
 import { useLocale } from '../i18n';
 import type { AigramContact } from '../types';
 
+const ALTERU_APP_URL = 'https://apps.apple.com/app/id6769646546';
+
 interface Props {
   contacts: AigramContact[];
   loading: boolean;
@@ -54,7 +56,12 @@ export default function ContactPicker({
           {isIt ? t('picker.h2_tag_back') : t('picker.h2_tag')}
         </h2>
         {isDemo && (
-          <div className="tyi-picker__hint tyi-prose">{t('picker.preview_hint')}</div>
+          <div className="tyi-picker__hint tyi-prose tyi-download">
+            <span>{t('picker.preview_hint')}</span>
+            <a href={ALTERU_APP_URL} target="_blank" rel="noopener noreferrer">
+              {t('download_alteru')}
+            </a>
+          </div>
         )}
         {loading && (
           <div className="tyi-picker__empty tyi-prose">{t('picker.loading')}</div>

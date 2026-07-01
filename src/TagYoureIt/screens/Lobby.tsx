@@ -10,6 +10,8 @@ import { useLocale } from '../i18n';
 import { isInAigram } from '@shared/runtime';
 import type { IncomingTag, AigramContact } from '../types';
 
+const ALTERU_APP_URL = 'https://apps.apple.com/app/id6769646546';
+
 interface LobbyProps {
   isIt: boolean;
   newestIncoming: IncomingTag | null;
@@ -149,11 +151,16 @@ export default function Lobby({
             </div>
           </div>
         ) : (
-          <div className="tyi-lobby__noFriends tyi-prose">
+          <div className={`tyi-lobby__noFriends tyi-prose${isInAigram ? '' : ' tyi-download'}`}>
             {/* Two distinct empty-state messages:
-                 - user opened OUTSIDE Aigram → tell them to open in Aigram
-                 - user IS in Aigram but has no contacts yet → invite friends */}
-            {isInAigram ? t('lobby.no_friends_yet') : t('lobby.no_friends')}
+                 - user opened outside AlterU → route them to AlterU
+                 - user is in AlterU but has no contacts yet → invite friends */}
+            <span>{isInAigram ? t('lobby.no_friends_yet') : t('lobby.no_friends')}</span>
+            {!isInAigram && (
+              <a href={ALTERU_APP_URL} target="_blank" rel="noopener noreferrer">
+                {t('download_alteru')}
+              </a>
+            )}
           </div>
         )}
 

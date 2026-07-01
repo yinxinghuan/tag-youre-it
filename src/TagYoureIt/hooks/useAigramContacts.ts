@@ -71,7 +71,7 @@ export function useAigramContacts(): UseAigramContactsResult {
   useEffect(() => {
     if (!isInAigram) {
       // No bridge — surface an empty list. The picker shows an explicit
-      // "open in Aigram" empty state; demo URLs override this list.
+      // "open in AlterU" empty state; demo URLs override this list.
       setContacts([]);
       setIsDemo(true);
       setLoading(false);
